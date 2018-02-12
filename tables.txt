@@ -1,0 +1,131 @@
+TABLES['tweet'] = (
+"CREATE TABLE `tweet` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`id_str` varchar(40) NOT NULL,"
+"	`objectType` varchar(10) NOT NULL,"
+"	`verb` varchar(5) NOT NULL,"
+"	`postedTime` datetime NOT NULL,"
+"	`link` varchar(150) NOT NULL,"
+"	`body` varchar(140) NOT NULL,"
+"	`favorites` int(7) NOT NULL,"
+"	`retweet` int(7) NOT NULL,"
+"	`filter_lvl` varchar(10) NOT NULL,"
+"	`lang` varchar(20) NOT NULL,"
+"	`actor_id` int(18) NOT NULL,"
+"	`generator_name` varchar(50) NOT NULL,"
+"	`generator_link` varchar(150) NOT NULL,"
+"	`provider_name` varchar(50) NOT NULL,"
+"	`provider_link` varchar(150) NOT NULL,"
+"	`gnip_lang` varchar(10) NOT NULL,"
+"	PRIMARY KEY (`tweet_id`)"
+"	CONSTRAINT `tweet_actor_fk` FOREIGN KEY (`actor_id`)"
+"		REFERENCES `actor` (`actor_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['actor'] = (
+"CREATE TABLE `actor` ("
+"	`actor_id` int(18) NOT NULL,"
+"	`objectType` varchar(10) NOT NULL,"
+"	`link` varchar(150) NOT NULL,"
+"	`displayName` varchar(50) NOT NULL,"
+"	`postedTime` datetime NOT NULL,"
+"	`image` varchar(200),"
+"	`summary` varchar(150),"
+"	`friends` int(7) NOT NULL,"
+"	`followers` int(7) NOT NULL,"
+"	`listed` int(5) NOT NULL,"
+"	`favorites` int(7) NOT NULL,"
+"	`statuses` int(7) NOT NULL,"
+"	`timezone` varchar(50),"
+"	`verified` bool NOT NULL,"
+"	`utcOffset` int(6),"
+"	`preferredName` varchar(50) NOT NULL,"
+"	`id_str` varchar(40) NOT NULL,"
+"	`location` varchar(40),"
+"	PRIMARY KEY (`actor_id`)"
+") ENGINE=InnoDB")
+
+TABLES['actor_links'] = (
+"CREATE TABLE `actor_links` ("
+"	`actor_id` int(18) NOT NULL,"
+"	`href` varchar(100),"
+"	`rel` varchar(10) NOT NULL,"
+"	FOREIGN KEY (`actor_id`)"
+"		REFERENCES `actor` (`actor_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['actor_lang'] = (
+"CREATE TABLE `actor_lang` ("
+"	`actor_id` int(18) NOT NULL,"
+"	`lang` varchar(3)"
+"	FOREIGN KEY (`actor_id`)"
+"		REFERENCES `actor` (`actor_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['gnip_rules'] = (
+"CREATE TABLE `gnip_rules` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`value` varchar(20) NOT NULL,"
+"	`tag` varchar(50) NOT NULL,"
+"	FOREIGN KEY (`tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['hashtags'] = (
+"CREATE TABLE `hashtags` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`text` varchar(50) NOT NULL,"
+"	`start_index` int(3) NOT NULL,"
+"	`end_index int(3) NOT NULL,"
+"	FOREIGN KEY ('tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['urls'] = (
+"CREATE TABLE `urls` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`url` varchar(200) NOT NULL,"
+"	`extended_url` varchar(200) NOT NULL,"
+"	`displayUrl` varchar(200) NOT NULL,"
+"	`start_index int(3) NOT NULL,"
+"	`end_index int(3) NOT NULL,"
+"	FOREIGN KEY ('tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['user_mentions'] = (
+"CREATE TABLE `user_mentions` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`screen_name` varchar(50) NOT NULL,"
+"	`name` varchar(50) NOT NULL,"
+"	`id` int(8) NOT NULL,"
+"	`id_str` varchar(20) NOT NULL,"
+"	`start_index` int(3) NOT NULL,"
+"	`end_index int(3) NOT NULL,"
+"	FOREIGN KEY ('tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['symbols'] = (
+"CREATE TABLE `symbols` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`text` varchar(50) NOT NULL,"
+"	`start_index` int(3) NOT NULL,"
+"	`end_index int(3) NOT NULL,"
+"	FOREIGN KEY ('tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
+
+TABLES['objects'] = (
+"CREATE TABLE `objects` ("
+"	`tweet_id` int(18) NOT NULL,"
+"	`object_id` int(18) NOT NULL,"
+"	`objectType` varchar(10) NOT NULL,"
+"	`summary` varchar(140) NOT NULL,"
+"	`link` varchar(200) NOT NULL,"
+"	`postedTime` datetime NOT NULL,"
+"	`id_str` varchar(200) NOT NULL,"
+"	PRIMARY KEY `object_id`,"
+"	FOREIGN KEY ('tweet_id`)"
+"		REFERENCES `tweet` (`tweet_id`) ON DELETE CASCADE"
+") ENGINE=InnoDB")
