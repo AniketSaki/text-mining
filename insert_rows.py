@@ -256,6 +256,8 @@ def format_object(object):
             del a, b, y, m, d
         object['object']['idtweet'] = object['idtweet'] = int(object['id'].split(':')[2])
         del object['id']
+        if 'in_reply_to' in object:
+            object['in_reply_to'] = int(object['in_reply_to']['link'].split('/')[-1])
         object['filter_level'] = object['twitter_filter_level']
         del object['twitter_filter_level']
         object['generator_name'] = object['generator']['displayName']
@@ -303,6 +305,7 @@ def unpack_json(filename):
                         insert_object(json_tweet)
                         insert_actor_links(json_tweet)
                         insert_actor_lang(json_tweet)
+
                         insert_gnip(json_tweet)
                         if len(json_tweet['twitter_entities']['hashtags']) > 0:
                             insert_hashtags(json_tweet)
