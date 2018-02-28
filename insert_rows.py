@@ -10,8 +10,11 @@ password = user = 'aniket'
 root = 'admin'
 database = 'twitter'
 host = '127.0.0.1'
-directory = os.fsencode('L:/PTDataDownload/trial/')
+directory = os.fsencode('L:/PTDataDownload/json')
+count = 0
+total = 5233
 cnx = mysql.connector.connect(user=user, password=password, host=host, database=database)
+cnx.set_charset_collation('utf8mb4', 'utf8mb4_bin')
 cursor = cnx.cursor()
 
 
@@ -41,6 +44,8 @@ def insert_actor(object):
 def insert_tweet(object):
     our_object = deepcopy(object)
     del our_object['actor'], our_object['object'], our_object['gnip'], our_object['twitter_entities']
+    if 'location' in our_object:
+        del our_object['location']
     query = 'INSERT INTO tweet ('
     params = 'VALUES ('
     for attribute in our_object.keys():
@@ -78,6 +83,28 @@ def insert_object(object):
         print(err.msg)
     except mysql.connector.DatabaseError as err:
         print(err.msg)
+
+
+def insert_location(object):
+    our_object = deepcopy(object['location'])
+    our_object['idtweet'] = object['idtweet']
+    if 'geo' in our_object:
+        del our_object['geo']
+    query = 'INSERT INTO location ('
+    params = 'VALUES ('
+    for attribute in our_object.keys():
+        query = query + attribute + ', '
+        params = params + '%(' + attribute + ')s, '
+    query = query.strip(', ')
+    query = query + ') '
+    params = params.strip(', ')
+    params = params + ')'
+    try:
+        cursor.execute(query + params, our_object)
+    except mysql.connector.ProgrammingError as pe:
+        print(pe.msg)
+    except mysql.connector.DatabaseError as de:
+        print(de.msg)
 
 
 def insert_actor_links(object):
@@ -254,20 +281,24 @@ def format_object(object):
             y, m, d = b.split('.')[0].split(':')
             object['object']['postedTime'] = time(int(y), int(m), int(d))
             del a, b, y, m, d
-        object['object']['idtweet'] = object['idtweet'] = int(object['id'].split(':')[2])
+        object['object']['idtweet'] = object['idtweet'] = int(object['id'].split(':')[-1])
         del object['id']
-        if 'in_reply_to' in object:
-            object['in_reply_to'] = int(object['in_reply_to']['link'].split('/')[-1])
-        object['filter_level'] = object['twitter_filter_level']
-        del object['twitter_filter_level']
+        if 'inReplyTo' in object:
+            object['inReplyTo'] = int(object['inReplyTo']['link'].split('/')[-1])
+        if 'geo' in object:
+            del object['geo']
+        if 'twitter_filter_level' in object:
+            object['filter_level'] = object['twitter_filter_level']
+            del object['twitter_filter_level']
         object['generator_name'] = object['generator']['displayName']
         object['generator_link'] = object['generator']['link']
         del object['generator']
         object['provider_name'] = object['provider']['displayName']
         object['provider_link'] = object['provider']['link']
         del object['provider']
-        object['gnip_lang'] = object['gnip']['language']['value']
-        object['idactor'] = object['actor']['idactor'] = int(object['actor']['id'].split(':')[2])
+        if 'language' in object['gnip']:
+            object['gnip_lang'] = object['gnip']['language']['value']
+        object['idactor'] = object['actor']['idactor'] = int(object['actor']['id'].split(':')[-1])
         del object['actor']['id']
         if 'location' in object['actor']:
             object['actor']['location'] = object['actor']['location']['displayName']
@@ -278,7 +309,7 @@ def format_object(object):
                 object['actor']['verified'] = 1
             else:
                 object['actor']['verified'] = 0
-        object['object']['idobject'] = int(object['object']['id'].split(':')[2])
+        object['object']['idobject'] = int(object['object']['id'].split(':')[-1])
         del object['object']['id']
         if 'body' in object['object']:
             object['object']['summary'] = object['object']['body']
@@ -305,7 +336,8 @@ def unpack_json(filename):
                         insert_object(json_tweet)
                         insert_actor_links(json_tweet)
                         insert_actor_lang(json_tweet)
-
+                        if 'location' in json_tweet:
+                            insert_location(json_tweet)
                         insert_gnip(json_tweet)
                         if len(json_tweet['twitter_entities']['hashtags']) > 0:
                             insert_hashtags(json_tweet)
@@ -328,4 +360,7 @@ def unpack_json(filename):
 for file in os.listdir(directory):
     filepath = os.path.join(directory, file)
     unpack_json(filepath)
+    print('------------------------------------------------------------------------------------------------')
+    count = count + 1
+    print(count / total)
     print('completed: ', filepath)
