@@ -2,6 +2,7 @@ import json
 import os
 from copy import deepcopy
 from datetime import date, time
+from tkinter import ttk, Tk, Label, LEFT
 
 import mysql.connector
 import mysql.connector.errors
@@ -11,11 +12,21 @@ root = 'admin'
 database = 'twitter'
 host = '127.0.0.1'
 directory = os.fsencode('L:/PTDataDownload/json')
+log_file = open('log.txt', 'w+')
 count = 0
-total = 5233
+total = 4553
 cnx = mysql.connector.connect(user=user, password=password, host=host, database=database)
 cnx.set_charset_collation('utf8mb4', 'utf8mb4_bin')
 cursor = cnx.cursor()
+root = Tk()
+progressbar = ttk.Progressbar(root, orient='horizontal', length='500')
+progressbar.pack()
+label1 = Label(root, text=str(count) + '/' + str(total))
+label1.pack(side=LEFT)
+
+
+def update_bar():
+    progressbar.step(1 / total)
 
 
 def insert_actor(object):
@@ -36,9 +47,9 @@ def insert_actor(object):
     try:
         cursor.execute(query + params, actor)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_tweet(object):
@@ -58,9 +69,9 @@ def insert_tweet(object):
     try:
         cursor.execute(query + params, our_object)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_object(object):
@@ -80,9 +91,9 @@ def insert_object(object):
     try:
         cursor.execute(query + params, our_object)
     except mysql.connector.ProgrammingError as err:
-        print(err.msg)
+        log_file.write(err.msg)
     except mysql.connector.DatabaseError as err:
-        print(err.msg)
+        log_file.write(err.msg)
 
 
 def insert_location(object):
@@ -102,9 +113,9 @@ def insert_location(object):
     try:
         cursor.execute(query + params, our_object)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_actor_links(object):
@@ -118,9 +129,9 @@ def insert_actor_links(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_actor_lang(object):
@@ -134,9 +145,9 @@ def insert_actor_lang(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_gnip(object):
@@ -150,9 +161,9 @@ def insert_gnip(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_hashtags(object):
@@ -166,9 +177,9 @@ def insert_hashtags(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_symbols(object):
@@ -182,9 +193,9 @@ def insert_symbols(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_urls(object):
@@ -199,9 +210,9 @@ def insert_urls(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_mentions(object):
@@ -216,9 +227,9 @@ def insert_mentions(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_media(object):
@@ -235,9 +246,9 @@ def insert_media(object):
     try:
         cursor.executemany(query + params, data)
     except mysql.connector.ProgrammingError as pe:
-        print(pe.msg)
+        log_file.write(pe.msg)
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 def insert_media_sizes(object):
@@ -253,9 +264,9 @@ def insert_media_sizes(object):
         try:
             cursor.executemany(query + params, data)
         except mysql.connector.ProgrammingError as err:
-            print(err.msg)
+            log_file.write(err.msg)
         except mysql.connector.DatabaseError as err:
-            print(err.msg)
+            log_file.write(err.msg)
 
 
 def format_object(object):
@@ -315,7 +326,7 @@ def format_object(object):
             object['object']['summary'] = object['object']['body']
             del object['object']['body']
     except KeyError as ke:
-        print(ke)
+        log_file.write(ke)
 
 
 def unpack_json(filename):
@@ -352,15 +363,19 @@ def unpack_json(filename):
                             insert_media_sizes(json_tweet)
                         cnx.commit()
     except UnicodeDecodeError as er:
-        print(er)
+        log_file.write(er.with_traceback())
+    except ValueError as ve:
+        log_file.write(ve.with_traceback())
     except mysql.connector.DatabaseError as de:
-        print(de.msg)
+        log_file.write(de.msg)
 
 
 for file in os.listdir(directory):
+    root.mainloop()
     filepath = os.path.join(directory, file)
     unpack_json(filepath)
-    print('------------------------------------------------------------------------------------------------')
     count = count + 1
+    update_bar()
+    print('------------------------------------------------------------------------------------------------')
     print(count / total)
     print('completed: ', filepath)
