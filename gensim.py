@@ -1,5 +1,4 @@
 import pickle
-
 import mysql.connector
 import numpy
 from gensim import models, matutils
@@ -10,7 +9,7 @@ from Code.preprocess import *
 def update_matrix(i, j):
     ids.append([ids[i], ids[j]])
     vectors.append(matutils.unitvec(numpy.mean([vectors[i], vectors[j]], axis=0)))
-    del ids[i], ids[j], cos_sim[i], cos_sim[j]
+    del ids[i], ids[j], cos_sim[i], cos_sim[j], vectors[i], vectors[j]
     cos_sim.append([])
     for i in range(0, len(vectors) - 1):
         cos_sim[-1].append(numpy.dot(vectors[-1], vectors[i]))
