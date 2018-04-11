@@ -9,7 +9,7 @@ def hashtag(text):
 
 
 def mention(text):
-    return re.sub('@[a-zA-Z0-9]+', '', text)
+    return re.sub('@[a-zA-Z0-9_]+', '', text)
 
 
 def url(text):
