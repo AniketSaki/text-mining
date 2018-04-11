@@ -34,7 +34,6 @@ i = 0
 
 # store tokens and calculate cosine similarity matrix
 for record in cursor:
-    ids.append([record[0]])
     tweet = record[1]
     tweet = hashtag(tweet)
     tweet = mention(tweet)
@@ -42,11 +41,13 @@ for record in cursor:
     tweet = punctuation(tweet)
     words = stopword(tweet)
     v1 = [model[word] for word in words if word in model.vocab]
-    vectors.append(matutils.unitvec(numpy.mean(v1, axis=0)))
-    for j in range(0, len(vectors) - 1):
-        cos_sim[i].append(numpy.dot(vectors[i], vectors[j]))
-    i += 1
-    cos_sim.append([])
+    if len(v1) > 0:
+        vectors.append(matutils.unitvec(numpy.mean(v1, axis=0)))
+        for j in range(0, len(vectors) - 1):
+            cos_sim[i].append(numpy.dot(vectors[i], vectors[j]))
+        ids.append([record[0]])
+        i += 1
+        cos_sim.append([])
 # store to file
 with open('cos_sim.pkl', 'wb') as cm:
     pickle.dump(cos_sim, cm)
